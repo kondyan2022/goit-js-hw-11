@@ -3,7 +3,7 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import PixabayApiService from './js/pixabay-api';
 
-refs = {
+const refs = {
   gallery: document.querySelector('.gallery'),
   form: document.querySelector('.search-form'),
   btnMore: document.querySelector('.load-more'),
