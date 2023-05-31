@@ -10,7 +10,7 @@ const refs = {
 };
 
 refs.btnMore.hidden = true;
-const pixabayApiService = new PixabayApiService((itemsPerPage = 40));
+const pixabayApiService = new PixabayApiService(40);
 
 let lightbox = new SimpleLightbox('.gallery a', {
   // captionsData: 'alt',
