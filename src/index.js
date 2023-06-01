@@ -38,6 +38,7 @@ refs.form.addEventListener('submit', onSearch);
 async function onSearch(event) {
   try {
     event.preventDefault();
+    clearGalleryList();
     // refs.btnMore.hidden = true;
     observer.unobserve(refs.guard);
     const {
@@ -45,7 +46,7 @@ async function onSearch(event) {
     } = event.currentTarget;
     pixabayApiService.SearchQuery = searchQuery.value;
     const response = await pixabayApiService.fetchImages();
-    clearGalleryList();
+
     const {
       data: { totalHits, hits },
     } = response;
