@@ -36,6 +36,6 @@ export default class PixabayApiService {
     return response;
   }
   isLastPage() {
-    return this.currentPage * this.itemsPerPage > this.totalHits;
+    return this.currentPage > Math.ceil(this.totalHits / this.itemsPerPage);
   }
 }
