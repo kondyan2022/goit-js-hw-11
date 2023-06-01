@@ -38,9 +38,10 @@ refs.form.addEventListener('submit', onSearch);
 async function onSearch(event) {
   try {
     event.preventDefault();
-    clearGalleryList();
+
     // refs.btnMore.hidden = true;
     observer.unobserve(refs.guard);
+    clearGalleryList();
     const {
       elements: { searchQuery },
     } = event.currentTarget;
