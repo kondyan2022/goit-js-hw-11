@@ -13,7 +13,7 @@ const refs = {
 
 const itemsPerPage = 40;
 // refs.btnMore.hidden = true;
-
+// измененеия
 let options = {
   root: null,
   rootMargin: '300px',
@@ -39,7 +39,7 @@ async function onSearch(event) {
   try {
     event.preventDefault();
     // refs.btnMore.hidden = true;
-
+    observer.unobserve(refs.guard);
     const {
       elements: { searchQuery },
     } = event.currentTarget;
@@ -74,7 +74,9 @@ async function onNextPage(event) {
     } = response;
 
     addGalleryList(hits);
+
     safeScroll();
+
     // if (refs.btnMore.hidden) {
     if (pixabayApiService.isLastPage()) {
       Notify.warning(
