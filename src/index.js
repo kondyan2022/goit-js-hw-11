@@ -2,35 +2,50 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import PixabayApiService from './js/pixabay-api';
+import createMarkup from './js/gallery-markup';
 
 const refs = {
   gallery: document.querySelector('.gallery'),
   form: document.querySelector('.search-form'),
   btnMore: document.querySelector('.load-more'),
+  guard: document.querySelector('.js-guard'),
 };
 
-refs.btnMore.hidden = true;
-const pixabayApiService = new PixabayApiService(40);
+const itemsPerPage = 40;
+// refs.btnMore.hidden = true;
 
-let lightbox = new SimpleLightbox('.gallery a', {
-  // captionsData: 'alt',
-  // captionDelay: 250,
-});
+let options = {
+  root: null,
+  rootMargin: '300px',
+  threshold: 1.0,
+};
+let observer = new IntersectionObserver((entieres, observer) => {
+  entieres.forEach(ent => {
+    if (ent.target === refs.guard && ent.isIntersecting) {
+      observer.unobserve(refs.guard);
+      onNextPage();
+    }
+  });
+}, options);
+
+const pixabayApiService = new PixabayApiService(itemsPerPage);
+
+let lightbox = new SimpleLightbox('.gallery a');
 
 refs.form.addEventListener('submit', onSearch);
-refs.btnMore.addEventListener('click', onNextPage);
+// refs.btnMore.addEventListener('click', onNextPage);
 
 async function onSearch(event) {
   try {
     event.preventDefault();
-    refs.btnMore.hidden = true;
-    clearGalleryList();
+    // refs.btnMore.hidden = true;
+
     const {
       elements: { searchQuery },
     } = event.currentTarget;
     pixabayApiService.SearchQuery = searchQuery.value;
     const response = await pixabayApiService.fetchImages();
-
+    clearGalleryList();
     const {
       data: { totalHits, hits },
     } = response;
@@ -42,7 +57,7 @@ async function onSearch(event) {
       Notify.failure(
         'Sorry, there are no images maching your search query. Please try again!'
       );
-      refs.btnMore.hidden = true;
+      // refs.btnMore.hidden = true;
     }
   } catch (error) {
     Notify.failure(`Error with message: ${error.message} !`);
@@ -60,7 +75,8 @@ async function onNextPage(event) {
 
     addGalleryList(hits);
     safeScroll();
-    if (refs.btnMore.hidden) {
+    // if (refs.btnMore.hidden) {
+    if (pixabayApiService.isLastPage()) {
       Notify.warning(
         "We're sorry, but you've reached the end of search results."
       );
@@ -90,41 +106,11 @@ function addGalleryList(array) {
     'beforeend',
     array.map(createMarkup).join('')
   );
-
-  refs.btnMore.hidden = pixabayApiService.isLastPage();
+  if (pixabayApiService.isLastPage()) {
+    observer.unobserve(refs.guard);
+  } else {
+    observer.observe(refs.guard);
+  }
+  // refs.btnMore.hidden = pixabayApiService.isLastPage();
   lightbox.refresh();
-}
-
-function createMarkup({
-  webformatURL,
-  largeImageURL,
-  tags,
-  likes,
-  views,
-  comments,
-  downloads,
-}) {
-  return `<div class="photo-card" >
-      <a href ="${largeImageURL}">
-        <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-      </a>   
-      <div class="info">
-        <p class="info-item">
-          <b>Likes</b>
-          ${likes}
-        </p>
-        <p class="info-item">
-          <b>Views</b>
-          ${views}
-        </p>
-        <p class="info-item">
-          <b>Comments</b>
-          ${comments}
-        </p>
-        <p class="info-item">
-          <b>Downloads</b>
-          ${downloads}
-        </p>
-      </div>
-    </div>`;
 }
